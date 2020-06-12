@@ -14,25 +14,21 @@ public class GameLogic : MonoBehaviour
 
     public string input;
     public GameObject inputText;
-//    public GameObject guesses;
     public GameObject hint;
     public GameObject list;
+    public GameObject remaining;
 
     public List<int> guessArray = new List<int>();
 
-    // Start is called before the first frame update
     void Start()
     {
         currentNumber = UnityEngine.Random.Range(1, 1000);
-        guessCount = 5;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Debug.Log(currentNumber);
-        Debug.Log(inputNumber);
         Check();
+        remaining.GetComponent<TextMeshProUGUI>().text = "Liko: " + (guessCount - guessArray.Count);
     }
 
     void Check()
@@ -43,40 +39,36 @@ public class GameLogic : MonoBehaviour
         }
         else if (guessArray.Count >= guessCount)
         {
-            StartCoroutine(CustomWait());
+            StartCoroutine(Wait(5));
             SceneManager.LoadScene(2);
         }
     }
 
-    IEnumerator CustomWait()
+    static IEnumerator Wait(int t)
     {
-        //Print the time of when the function is first called.
-        Debug.Log("Started Coroutine at timestamp : " + Time.time);
-
-        //yield on a new YieldInstruction that waits for 5 seconds.
-        yield return new WaitForSeconds(10);
-
-        //After we have waited 5 seconds print the time again.
-        Debug.Log("Finished Coroutine at timestamp : " + Time.time);
+        yield return new WaitForSeconds(t);
     }
 
     public void AssignInput()
     {
         input = inputText.GetComponent<Text>().text;
-//        guesses.GetComponent<Text>().text = "You entered: " + input;
         inputNumber = Convert.ToInt32(input);
         guessArray.Add(inputNumber);
-        list.GetComponent<TextMeshProUGUI>().text = "You entered: "; 
-        foreach (int g in guessArray)
-        {
-            list.GetComponent<TextMeshProUGUI>().text += g + " ";
-        }
+
+        Print();
+        
         if (inputNumber > currentNumber)
             hint.GetComponent<TextMeshProUGUI>().text = "Įvestas skaičius yra didesnis už sugeneruotą";
         else if (inputNumber < currentNumber && guessArray.Count < guessCount)
-        {
             hint.GetComponent<TextMeshProUGUI>().text = "Įvestas skaičius yra mažesnis už sugeneruotą";
+    }
 
+    private void Print()
+    {
+        list.GetComponent<TextMeshProUGUI>().text = "Bandymai: ";
+        foreach (int g in guessArray)
+        {
+            list.GetComponent<TextMeshProUGUI>().text += g + " ";
         }
     }
 }
